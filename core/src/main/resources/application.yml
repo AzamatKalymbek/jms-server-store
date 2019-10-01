@@ -1,0 +1,20 @@
+spring:
+  mail:
+    host: mail.c2p.kz
+    port: 587
+    username: agent@c2p.kz
+    password: Qwerty12345
+    from: C2P
+    default-encoding: UTF-8
+    mime.charset: utf8
+    properties.mail.smtp:
+      auth: true
+      starttls.enable: true
+      socketFactory.port: 465
+      socketFactory.fallback: false
+      ssl.trust: mail.c2p.kz
+      writetimeout: 5000
+      timeout: 3000
+      connecttimeout: 5000
+  profiles:
+    active: dev
