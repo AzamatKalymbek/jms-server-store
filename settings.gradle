@@ -1,0 +1,5 @@
+rootProject.name = 'jms-server-store'
+include 'eureka'
+include 'gateway'
+include 'core'
+
