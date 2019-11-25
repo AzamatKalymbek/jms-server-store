@@ -70,20 +70,30 @@ public class AlgorithmController {
         logger.debug("inside AlgorithmController.getMaxMin() method");
         logger.debug("====================================================================");
 
-        HashMap map = new HashMap<>();
+
         List<Data> zeroList = iMaxMinService.start(viaMatrixDistance);
         List<HashMap<String, Object>> cluster = iKmeanService.start(zeroList, viaNearestNeighbor, clusterCount, iterCount);
+        HashMap map = new HashMap<>();
         map.put("ALG", cluster);
         map.put("FQ" , iReduceService.getQualityFunctional(cluster));
         return map;
     }
 
-    @GetMapping("/reduce")
+    @GetMapping("/reduce/{initialValue}/{reduceValue}")
     @Produces("application/json")
     @ApiOperation(value = "REDUCE", tags = {"Algorithm"})
-    public List<HashMap<String, Object>> getReduce() {
+    public HashMap getReduce(
+            @PathVariable("initialValue")      Integer initialValue,
+            @PathVariable("reduceValue")       Integer reduceValue
+    ) {
+//        @PathVariable("viaMatrixDistance") Boolean viaMatrixDistance
         logger.debug("inside AlgorithmController.getReduce() method");
         logger.debug("====================================================================");
-        return iReduceService.start(false, null, 7, 5);
+//        List<Data> zeroList = iMaxMinService.start(viaMatrixDistance);
+        List<HashMap<String, Object>> cluster = iReduceService.start(false, null, initialValue, reduceValue);
+        HashMap map = new HashMap<>();
+        map.put("ALG", cluster);
+        map.put("FQ" , iReduceService.getQualityFunctional(cluster));
+        return map;
     }
 }

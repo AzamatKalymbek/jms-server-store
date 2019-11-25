@@ -22,8 +22,6 @@ public class ReduceService implements IReduceService {
     // object list
     private List<Data> dataList = FillFunctions.fillDataListFromTxtFile();
     private List<HashMap<String, Object>> clusters;
-    // Кол-во классов
-    private Integer L_CURRENT = 6, L_REQUIRED = 4;
     private Map<Integer, Double> qualityFunctional = new HashMap<Integer, Double>();
     private Double initialQF = 0.0;
 
@@ -32,15 +30,16 @@ public class ReduceService implements IReduceService {
 
     @Override
     public List<HashMap<String, Object>> start(Boolean customInput, List<Data> zeroList, Integer initialValue, Integer reduceValue){
-        Scanner input = new Scanner(System.in);
+
         // fill params by default value
         if(customInput){
+            Scanner input = new Scanner(System.in);
             clusters = kmeanService.start(null, false, 3, 50);
             System.out.println("Required cluster size: ");
-            L_REQUIRED = input.nextInt();
-            while(L_REQUIRED >= clusters.size()){
+            reduceValue = input.nextInt();
+            while(reduceValue >= clusters.size()){
                 System.out.println("Invalid cluster size. Must be greater than existing cluster size. Type again: ");
-                L_REQUIRED = input.nextInt();
+                reduceValue = input.nextInt();
             }
         }else{
             if(zeroList != null){
@@ -48,10 +47,9 @@ public class ReduceService implements IReduceService {
             }else{
                 clusters = kmeanService.startWithRandomCenter(initialValue, 3, 50);
             }
-            L_REQUIRED = reduceValue;
         }
 
-        while(L_REQUIRED < clusters.size()){
+        while(reduceValue < clusters.size()){
             initialQF = getQualityFunctional(clusters);
             for(int i = 0; i < clusters.size(); i++){
                 List<HashMap<String, Object>> tempClusters = copy();
