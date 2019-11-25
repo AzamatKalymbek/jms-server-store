@@ -111,27 +111,27 @@ public class SynthesisService implements ISynthesisService {
 
     private List<HashMap<String, Object>> algorithm1() {
         System.out.println("A-1 => K-meas 5 классов (центры рандомно)");
-        List<HashMap<String, Object>> clusters = iKmeanService.startWithRandomCenter(5);
+        List<HashMap<String, Object>> clusters = iKmeanService.startWithRandomCenter(5, 3, 50);
         return clusters;
     }
 
     private List<HashMap<String, Object>> algorithm2() {
         System.out.println("A-2 => K-meas 6 классов (центры рандомно)");
-        List<HashMap<String, Object>> clusters =  iKmeanService.startWithRandomCenter(6);
+        List<HashMap<String, Object>> clusters =  iKmeanService.startWithRandomCenter(6, 3, 50);
         return clusters;
     }
 
     private List<HashMap<String, Object>> algorithm3() {
         System.out.println("A-3 => max-min + ближайший сосед");
         List<Data> zeroList = iMaxMinService.start(false);
-        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, true);
+        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, true, 3, 50);
         return clusters;
     }
 
     private List<HashMap<String, Object>> algorithm4() {
         System.out.println("A-4 => max-min (через матрицы расстояние) + ближайший сосед");
         List<Data> zeroList = iMaxMinService.start(true);
-        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, true);
+        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, true, 3, 50);
         return clusters;
     }
 
@@ -150,27 +150,27 @@ public class SynthesisService implements ISynthesisService {
     private List<HashMap<String, Object>> algorithm7() {
         System.out.println("A-7 => max-min + K-means");
         List<Data> zeroList = iMaxMinService.start(true);
-        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, false);
+        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, false, 3, 50);
         return clusters;
     }
 
     private List<HashMap<String, Object>> algorithm8() {
         System.out.println("A-8 => max-min + ABO");
         List<Data> zeroList = iMaxMinService.start(false);
-        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0);
+        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0, 2);
         return clusters;
     }
 
     private List<HashMap<String, Object>> algorithm9() {
         System.out.println("A-9 => max-min(matrix distance) + ABO");
         List<Data> zeroList = iMaxMinService.start(true);
-        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0);
+        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0, 2);
         return clusters;
     }
 
     private List<HashMap<String, Object>> algorithm10() {
         System.out.println("A-10 => руч центр + ABO");
-        List<HashMap<String, Object>> clusters = iAvoService.start(null, 3);
+        List<HashMap<String, Object>> clusters = iAvoService.start(null, 3, 2);
         return clusters;
     }
 
@@ -199,27 +199,27 @@ public class SynthesisService implements ISynthesisService {
 
     private double algorithm1(List<Data> zeroList) {
         System.out.println("A-1 => K-meas " + zeroList.size() + " классов (центры экспертно)");
-        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, false);
+        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, false, 3, 50);
         return iReduceService.getQualityFunctional(clusters);
     }
 
     private double algorithm2(List<Data> zeroList) {
         System.out.println("A-2 => K-meas " + zeroList.size() + " классов (центры экспертно)");
-        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, false);
+        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, false, 3, 50);
         return iReduceService.getQualityFunctional(clusters);
     }
 
     private double algorithm3(List<Data> zeroList) {
         System.out.println("A-3 => max-min + ближайший сосед");
 //        List<Data> zeroList = Maxmin.startMaxminAlgorithm(false);
-        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, true);
+        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, true, 3, 50);
         return iReduceService.getQualityFunctional(clusters);
     }
 
     private double algorithm4(List<Data> zeroList) {
         System.out.println("A-4 => max-min (через матрицы расстояние) + ближайший сосед");
 //        List<Data> zeroList = Maxmin.startMaxminAlgorithm(true);
-        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, true);
+        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, true, 3, 50);
         return iReduceService.getQualityFunctional(clusters);
     }
 
@@ -239,27 +239,27 @@ public class SynthesisService implements ISynthesisService {
     private double algorithm7(List<Data> zeroList) {
         System.out.println("A-7 => max-min + K-means");
 //        List<Data> zeroList = Maxmin.startMaxminAlgorithm(true);
-        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, false);
+        List<HashMap<String, Object>> clusters = iKmeanService.start(zeroList, false, 3, 50);
         return iReduceService.getQualityFunctional(clusters);
     }
 
     private double algorithm8(List<Data> zeroList) {
         System.out.println("A-8 => max-min + ABO");
 //        List<Data> zeroList = Maxmin.startMaxminAlgorithm(false);
-        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0);
+        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0, 2);
         return iReduceService.getQualityFunctional(clusters);
     }
 
     private double algorithm9(List<Data> zeroList) {
         System.out.println("A-9 => max-min(matrix distance) + ABO");
 //        List<Data> zeroList = Maxmin.startMaxminAlgorithm(true);
-        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0);
+        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0, 2);
         return iReduceService.getQualityFunctional(clusters);
     }
 
     private double algorithm10(List<Data> zeroList) {
         System.out.println("A-10 => руч центр + ABO");
-        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 3);
+        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 3, 2);
         return iReduceService.getQualityFunctional(clusters);
     }
 }

@@ -1,6 +1,7 @@
 package kz.teamvictus.store.core.service.impl;
 
 import kz.teamvictus.store.core.service.IKmeanService;
+import kz.teamvictus.store.core.service.IReduceService;
 import kz.teamvictus.store.core.util.functions.CommonFunctions;
 import kz.teamvictus.store.core.util.functions.DisplayFunctions;
 import kz.teamvictus.store.core.util.functions.FillFunctions;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Map;
 
 import static kz.teamvictus.store.core.util.constance.CoreConstance.clusterCenterKey;
 import static kz.teamvictus.store.core.util.constance.CoreConstance.clusterObjectsKey;
@@ -24,22 +25,20 @@ public class KmeanService implements IKmeanService {
     private static final Logger logger = LoggerFactory.getLogger(KmeanService.class);
 
     // Исходные данные
-    private static List<Data> dataList;
-    private static List<Data> zeroLists;
+    private List<Data> dataList;
+    private List<Data> zeroLists;
     // Массив центров классов (содержить в себе индексы внесенный пользователем)
-    private static Integer[] centerIndexes;
-    // Кол-во классов
-    private static Integer L = 3;
-    // Кол-во итераторов
-    private static Integer ITR = 50;
+    private Integer[] centerIndexes;
+    private List<HashMap<String, Object>> clusters = new ArrayList<>();
 
-    private static List<HashMap<String, Object>> clusters = new ArrayList<>();
-
+    @Autowired
+    private IReduceService iReduceService;
 
     @Override
-    public List<HashMap<String, Object>> start(List<Data> zeroList, Boolean viaNearestNeighbor) {
+    public List<HashMap<String, Object>> start(List<Data> zeroList, Boolean viaNearestNeighbor,
+                                               Integer clusterCount, Integer iterCount) {
         zeroLists = zeroList;
-        Scanner input = new Scanner(System.in);
+
         clusters = new ArrayList<>();
 
         // fill params
@@ -49,52 +48,31 @@ public class KmeanService implements IKmeanService {
 //        ITR = input.nextInt();
 
         if (zeroList == null) {
-            System.out.println("Type Class count:");
-            L = input.nextInt();
-            centerIndexes = new Integer[L];
+            centerIndexes = new Integer[clusterCount];
         } else {
-            L = zeroList.size();
+            clusterCount = zeroList.size();
         }
-
-//        System.out.println("=========================================");
-//        System.out.println("Информация о программе::");
-//        System.out.printf("Количество исходных обьектов: %d \n", dataList.size());
-//        System.out.printf("Кол-во итераций: %d \n", ITR);
-//        System.out.printf("Кол-во кластеров: %d \n", L);
-//        System.out.println("=========================================");
-//
-//        // Display sign list
-//        DisplayFunctions.printData(dataList);
 
         if (zeroLists == null) {
             // fill centers index
-            int iter = 0;
-            while (true) {
-                System.out.println("Type center index, left " + (L - iter));
-                int centerIndex = input.nextInt();
-                if (centerIndex >= dataList.size() || CommonFunctions.check(centerIndexes, centerIndex)) {
-                    System.out.println("Invalid index or center already exist, type again");
-                } else {
-                    centerIndexes[iter] = centerIndex;
-                    iter++;
-                    if (L - iter <= 0) break;
-                }
+            for(int iter = 0; iter < clusterCount; iter++){
+                centerIndexes[iter] = iter;
             }
         }
 
 
         System.out.println("=============== RESULT ==================");
         // Формируем классы
-        clusters = fillCluster(true, clusters, new ArrayList<>());
+        clusters = fillCluster(true, clusters, new ArrayList<>(), clusterCount);
 
 //        DisplayFunctions.printResult14D(clusters);
 
-        for (int itr = 0; itr < ITR; itr++) {
+        for (int itr = 0; itr < iterCount; itr++) {
             // step 3 Формируем классы
             // формула для нахождение расстояние между объектами
             // sqrt(pow((x1 - x2), 2) + pow((y1 - y2), 2))
             for (Data data : dataList) {
-                Double[] distanceList = new Double[L];
+                Double[] distanceList = new Double[clusterCount];
 
                 for (HashMap<String, Object> classEntity : clusters) {
                     if (!CommonFunctions.checkForEquality(data, (Data) classEntity.get(clusterCenterKey))) {
@@ -145,28 +123,28 @@ public class KmeanService implements IKmeanService {
 
                     newZeros.add(new Data(attributes));
                 }
-                if (checkingForEqualityOfCenters(newZeros) || itr == ITR - 1) {
+                if (checkingForEqualityOfCenters(newZeros, clusterCount) || itr == iterCount - 1) {
                     System.out.println("Finish ITR: " + itr);
                     break;
                 } else {
-                    clusters = fillCluster(false, clusters, newZeros);
+                    clusters = fillCluster(false, clusters, newZeros, clusterCount);
                 }
                 System.out.println("ITR " + itr + " finished ...");
             }
         }
 
-        DisplayFunctions.printResult14D(clusters);
         return clusters;
     }
 
     @Override
-    public List<HashMap<String, Object>> startWithRandomCenter(Integer classSize) {
+    public List<HashMap<String, Object>> startWithRandomCenter(Integer classSize,
+                                                               Integer clusterCount, Integer iterCount) {
         clusters = new ArrayList<>();
 
         // fill params
         dataList = FillFunctions.fillDataListFromTxtFile();
-        L = classSize;
-        centerIndexes = new Integer[L];
+        clusterCount = classSize;
+        centerIndexes = new Integer[clusterCount];
 
         // Display sign list
 //        DisplayFunctions.printData(dataList);
@@ -179,17 +157,17 @@ public class KmeanService implements IKmeanService {
                 centerIndexes[iter] = centerIndex;
                 iter++;
             }
-        } while (iter < L);
+        } while (iter < clusterCount);
 
         // Формируем классы
-        clusters = fillCluster(true, clusters, new ArrayList<>());
+        clusters = fillCluster(true, clusters, new ArrayList<>(), clusterCount);
 
-        for (int itr = 0; itr < ITR; itr++) {
+        for (int itr = 0; itr < iterCount; itr++) {
             // step 3 Формируем классы
             // формула для нахождение расстояние между объектами
             // sqrt(pow((x1 - x2), 2) + pow((y1 - y2), 2))
             for (Data data : dataList) {
-                Double[] distanceList = new Double[L];
+                Double[] distanceList = new Double[clusterCount];
 
                 for (HashMap<String, Object> classEntity : clusters) {
                     if (!CommonFunctions.checkForEquality(data, (Data) classEntity.get(clusterCenterKey))) {
@@ -240,10 +218,10 @@ public class KmeanService implements IKmeanService {
                 newZeros.add(new Data(attributes));
             }
 
-            if (checkingForEqualityOfCenters(newZeros) || itr == ITR - 1) {
+            if (checkingForEqualityOfCenters(newZeros, clusterCount) || itr == iterCount - 1) {
                 break;
             } else {
-                clusters = fillCluster(false, clusters, newZeros);
+                clusters = fillCluster(false, clusters, newZeros, clusterCount);
             }
         }
 
@@ -253,15 +231,13 @@ public class KmeanService implements IKmeanService {
 
     public void clear(){
         clusters = new ArrayList<>();
-        ITR = 50;
-        L = 3;
         centerIndexes = null;
         dataList = null;
         zeroLists = null;
     }
 
 
-    private static boolean checkingForEqualityOfCenters(List<Data> newZeros) {
+    private boolean checkingForEqualityOfCenters(List<Data> newZeros, Integer clusterCount) {
         int checkingIter = 0;
         for (int zeroIndex = 0; zeroIndex < newZeros.size(); zeroIndex++) {
             if (CommonFunctions.checkForEquality(
@@ -270,15 +246,16 @@ public class KmeanService implements IKmeanService {
                 checkingIter++;
             }
         }
-        return checkingIter == L;
+        return checkingIter == clusterCount;
     }
 
-    private static List<HashMap<String, Object>> fillCluster(boolean isDefault,
+    private List<HashMap<String, Object>> fillCluster(boolean isDefault,
                                                              List<HashMap<String, Object>> clusters,
-                                                             List<Data> newValues) {
+                                                             List<Data> newValues,
+                                                             Integer clusterCount) {
         if (isDefault) {
             if (zeroLists == null) {
-                for (int l = 0; l < L; l++) {
+                for (int l = 0; l < clusterCount; l++) {
                     Data centerData = dataList.get(centerIndexes[l]);
                     HashMap<String, Object> objectMap = new HashMap<String, Object>();
                     objectMap.put(clusterCenterKey, centerData);

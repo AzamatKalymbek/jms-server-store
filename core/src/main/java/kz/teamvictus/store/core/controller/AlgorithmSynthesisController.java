@@ -20,23 +20,23 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("/algorithm")
-@Api(tags = {"Algorithm"}, description = "C.R.U.D. operations for User", authorizations = {@Authorization(value = "bearerAuth")})
+@RequestMapping("/algorithm-syntethis")
+@Api(tags = {"AlgorithmSynthesis"}, description = "C.R.U.D. operations for AlgorithmSynthesis", authorizations = {@Authorization(value = "bearerAuth")})
 public class AlgorithmSynthesisController {
     private static final Logger logger = LoggerFactory.getLogger(AlgorithmSynthesisController.class);
 
-    @Autowired
-    private IAvoService iAvoService;
+//    @Autowired
+//    private IAvoService iAvoService;
 
 
 
-    @GetMapping("/avo")
-    @Produces("application/json")
-    @ApiOperation(value = "AVO", tags = {"Algorithm"})
-    public List<HashMap<String, Object>> getAVO() {
-        logger.debug("inside AlgorithmController.getAVO() method");
-        logger.debug("====================================================================");
-        return iAvoService.start(null, 0);
-    }
+//    @GetMapping("/avo")
+//    @Produces("application/json")
+//    @ApiOperation(value = "AVO", tags = {"Algorithm"})
+//    public List<HashMap<String, Object>> getAVO() {
+//        logger.debug("inside AlgorithmController.getAVO() method");
+//        logger.debug("====================================================================");
+//        return iAvoService.start(null, 0);
+//    }
 
 }
