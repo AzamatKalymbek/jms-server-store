@@ -13,7 +13,7 @@ bootJar {
 }
 
 springBoot {
-    mainClassName = 'kz.teamvictus.c2p.core.CoreApplication'
+    mainClassName = 'kz.teamvictus.store.core.CoreApplication'
 }
 
 dependencies {
@@ -25,9 +25,10 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '1.4.3.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-log4j'
-    compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.25.1'
+//    compile group: 'org.springframework.boot', name: 'spring-boot-starter-log4j'
+//    compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.25.1'
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
     compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.1.3.RELEASE'
-    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
+//    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
+    compile group: 'org.springframework.data', name: 'spring-data-mongodb', version: '2.0.5.RELEASE'
 }
