@@ -35,7 +35,7 @@ public class ReduceService implements IReduceService {
         Scanner input = new Scanner(System.in);
         // fill params by default value
         if(customInput){
-            clusters = kmeanService.start(null, false);
+            clusters = kmeanService.start(null, false, 3, 50);
             System.out.println("Required cluster size: ");
             L_REQUIRED = input.nextInt();
             while(L_REQUIRED >= clusters.size()){
@@ -44,9 +44,9 @@ public class ReduceService implements IReduceService {
             }
         }else{
             if(zeroList != null){
-                clusters = kmeanService.start(zeroList, false);
+                clusters = kmeanService.start(zeroList, false, 3, 50);
             }else{
-                clusters = kmeanService.startWithRandomCenter(initialValue);
+                clusters = kmeanService.startWithRandomCenter(initialValue, 3, 50);
             }
             L_REQUIRED = reduceValue;
         }

@@ -1,7 +1,6 @@
 package kz.teamvictus.store.core.controller;
 
 import io.swagger.annotations.*;
-import kz.teamvictus.store.core.model.User;
 import kz.teamvictus.store.core.service.IAvoService;
 import kz.teamvictus.store.core.service.IKmeanService;
 import kz.teamvictus.store.core.service.IMaxMinService;
@@ -31,32 +30,52 @@ public class AlgorithmController {
     @Autowired
     private IReduceService iReduceService;
 
-
-    @GetMapping("/avo")
+    @GetMapping("/avo/{clusterCount}/{gammaParam}")
     @Produces("application/json")
     @ApiOperation(value = "AVO", tags = {"Algorithm"})
-    public List<HashMap<String, Object>> getAVO() {
+    public HashMap getAVO(@PathVariable("clusterCount") Integer clusterCount,
+                          @PathVariable("gammaParam") Integer gammaParam) {
         logger.debug("inside AlgorithmController.getAVO() method");
         logger.debug("====================================================================");
-        return iAvoService.start(null, 0);
+        HashMap map = new HashMap<>();
+        List<HashMap<String, Object>> cluster = iAvoService.start(null, clusterCount, gammaParam);
+        map.put("ALG", cluster);
+        map.put("FQ" , iReduceService.getQualityFunctional(cluster));
+        return map;
     }
 
-    @GetMapping("/kmean")
+    @GetMapping("/kmean/{clusterCount}/{iterCount}/{viaNearestNeighbor}")
     @Produces("application/json")
     @ApiOperation(value = "K - Mean", tags = {"Algorithm"})
-    public List<HashMap<String, Object>> getKmean() {
+    public HashMap getKmean(@PathVariable("clusterCount")       Integer clusterCount,
+                            @PathVariable("iterCount")          Integer iterCount,
+                            @PathVariable("viaNearestNeighbor") Boolean viaNearestNeighbor) {
         logger.debug("inside AlgorithmController.getKmean() method");
         logger.debug("====================================================================");
-        return iKmeanService.start(null, false);
+        HashMap map = new HashMap<>();
+        List<HashMap<String, Object>> cluster = iKmeanService.start(null, viaNearestNeighbor, clusterCount, iterCount);
+        map.put("ALG", cluster);
+        map.put("FQ" , iReduceService.getQualityFunctional(cluster));
+
+        return map;
     }
 
-    @GetMapping("/max-min")
+    @GetMapping("/max-min/{clusterCount}/{iterCount}/{viaNearestNeighbor}/{viaMatrixDistance}")
     @Produces("application/json")
     @ApiOperation(value = "MAX - MIN", tags = {"Algorithm"})
-    public List<Data> getMaxMin() {
+    public HashMap getMaxMin(@PathVariable("clusterCount")       Integer clusterCount,
+                             @PathVariable("iterCount")          Integer iterCount,
+                             @PathVariable("viaNearestNeighbor") Boolean viaNearestNeighbor,
+                             @PathVariable("viaMatrixDistance")  Boolean viaMatrixDistance) {
         logger.debug("inside AlgorithmController.getMaxMin() method");
         logger.debug("====================================================================");
-        return iMaxMinService.start(false);
+
+        HashMap map = new HashMap<>();
+        List<Data> zeroList = iMaxMinService.start(viaMatrixDistance);
+        List<HashMap<String, Object>> cluster = iKmeanService.start(zeroList, viaNearestNeighbor, clusterCount, iterCount);
+        map.put("ALG", cluster);
+        map.put("FQ" , iReduceService.getQualityFunctional(cluster));
+        return map;
     }
 
     @GetMapping("/reduce")

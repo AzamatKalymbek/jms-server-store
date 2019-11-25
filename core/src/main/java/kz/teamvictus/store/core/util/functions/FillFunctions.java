@@ -4,9 +4,8 @@ package kz.teamvictus.store.core.util.functions;
 import kz.teamvictus.store.core.util.constance.CoreConstance;
 import kz.teamvictus.store.core.util.models.Data;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +17,11 @@ public class FillFunctions {
     public static List<Data> fillDataListFromTxtFile(){
         try {
             List<Data> dataList = new ArrayList<>();
-            BufferedReader br = new BufferedReader(new FileReader(CoreConstance.file2D));
+            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+            InputStream is = classloader.getResourceAsStream("2d_data.txt");
+            InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
+
+            BufferedReader br = new BufferedReader(streamReader);
             String st;
             while ((st = br.readLine()) != null){
                 List<Double> line = convertStringListToIntList(Arrays.asList(st.split(" ")), Double::parseDouble);

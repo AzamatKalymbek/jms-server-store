@@ -29,52 +29,26 @@ public class AvoService implements IAvoService {
     private List<Data> zeroLists;
     private Integer[] centerIndexes;
 
-    // Кол-во классов
-    private Integer L = 3;
-    private Integer gammaParam = 0;
-
     private List<HashMap<String, Object>> clusters = new ArrayList<>();
 
     private List<Double> epsilonList = new ArrayList<>();
 
     @Override
-    public List<HashMap<String, Object>> start(List<Data> zeroList, Integer classCount) {
+    public List<HashMap<String, Object>> start(List<Data> zeroList, Integer clusterCount, Integer gammaParam) {
         zeroLists = zeroList;
-        Scanner input = new Scanner(System.in);
         clusters = new ArrayList<>();
 
         // fill params
         dataList = FillFunctions.fillDataListFromTxtFile();
 
         calcEpsilon();
-
-        do {
-            System.out.println("Gamma parameter");
-            gammaParam = input.nextInt();
-        } while (gammaParam > epsilonList.size() || gammaParam < 0);
-
 //        System.out.println("Введите кол-во итераций:"); ITR = input.nextInt();
 
         if (zeroList == null) {
-            System.out.println("Type Class count:");
-            if(classCount == 0){
-                L = input.nextInt();
-            }else{
-                L = classCount;
-            }
-            centerIndexes = new Integer[L];
+            centerIndexes = new Integer[clusterCount];
         } else {
-            L = zeroList.size();
+            clusterCount = zeroList.size();
         }
-
-        System.out.println("=========================================");
-        System.out.println("Информация о программе::");
-        System.out.printf("Количество исходных обьектов: %d \n", dataList.size());
-        System.out.printf("Кол-во кластеров: %d \n", L);
-        System.out.println("=========================================");
-
-        // Display sign list
-        DisplayFunctions.printData(dataList);
 
         if (zeroLists == null) {
             // fill centers index
@@ -85,18 +59,18 @@ public class AvoService implements IAvoService {
                     centerIndexes[iter] = centerIndex;
                     iter++;
                 }
-            } while (iter < L);
+            } while (iter < clusterCount);
         }
 
         System.out.println("=============== RESULT ==================");
 
         // Формируем классы
-        clusters = fillCluster(true, clusters, new ArrayList<>());
+        clusters = fillCluster(true, clusters, new ArrayList<>(), clusterCount);
 
 //        DisplayFunctions.printResult14D(clusters);
 
         for (Data data : dataList) {
-            Double[] distanceList = new Double[L];
+            Double[] distanceList = new Double[clusterCount];
 
             System.out.println("===================start==========================");
             for (HashMap<String, Object> classEntity : clusters) {
@@ -144,7 +118,7 @@ public class AvoService implements IAvoService {
         return clusters;
     }
 
-    private boolean checkForAVO(Data obj1, Data obj2) {
+    private boolean checkForAVO(Data obj1, Data obj2, Integer gammaParam) {
         // e = 2 | (m / (m - 1))
         // m = число объектов
         // n - число признаков
@@ -195,7 +169,7 @@ public class AvoService implements IAvoService {
         return dividend / Math.sqrt(divider);
     }
 
-    private boolean checkingForEqualityOfCenters(List<Data> newZeros) {
+    private boolean checkingForEqualityOfCenters(List<Data> newZeros, Integer clusterCount) {
         int checkingIter = 0;
         for (int zeroIndex = 0; zeroIndex < newZeros.size(); zeroIndex++) {
             if (CommonFunctions.checkForEquality(
@@ -204,15 +178,16 @@ public class AvoService implements IAvoService {
                 checkingIter++;
             }
         }
-        return checkingIter == L;
+        return checkingIter == clusterCount;
     }
 
     private List<HashMap<String, Object>> fillCluster(boolean isDefault,
                                                              List<HashMap<String, Object>> clusters,
-                                                             List<Data> newValues) {
+                                                             List<Data> newValues,
+                                                             Integer clusterCount) {
         if (isDefault) {
             if (zeroLists == null) {
-                for (int l = 0; l < L; l++) {
+                for (int l = 0; l < clusterCount; l++) {
                     Data centerData = dataList.get(centerIndexes[l]);
                     HashMap<String, Object> objectMap = new HashMap<String, Object>();
                     objectMap.put(clusterCenterKey, centerData);
