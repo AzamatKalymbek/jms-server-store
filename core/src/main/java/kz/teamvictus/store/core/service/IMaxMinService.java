@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface IMaxMinService {
 
-    List<Data> start(Boolean viaMatrixDistance);
+    List<Data> start(Boolean viaMatrixDistance, String sourceFileName);
 }

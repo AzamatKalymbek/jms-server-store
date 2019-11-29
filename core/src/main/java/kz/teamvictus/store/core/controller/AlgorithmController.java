@@ -38,7 +38,7 @@ public class AlgorithmController {
         logger.debug("inside AlgorithmController.getAVO() method");
         logger.debug("====================================================================");
         HashMap map = new HashMap<>();
-        List<HashMap<String, Object>> cluster = iAvoService.start(null, clusterCount, gammaParam);
+        List<HashMap<String, Object>> cluster = iAvoService.start(null, clusterCount, gammaParam, "2d_data.txt");
         map.put("ALG", cluster);
         map.put("FQ" , iReduceService.getQualityFunctional(cluster));
         return map;
@@ -53,10 +53,9 @@ public class AlgorithmController {
         logger.debug("inside AlgorithmController.getKmean() method");
         logger.debug("====================================================================");
         HashMap map = new HashMap<>();
-        List<HashMap<String, Object>> cluster = iKmeanService.start(null, viaNearestNeighbor, clusterCount, iterCount);
+        List<HashMap<String, Object>> cluster = iKmeanService.start(null, viaNearestNeighbor, clusterCount, iterCount, "2d_data.txt");
         map.put("ALG", cluster);
         map.put("FQ" , iReduceService.getQualityFunctional(cluster));
-
         return map;
     }
 
@@ -71,8 +70,8 @@ public class AlgorithmController {
         logger.debug("====================================================================");
 
 
-        List<Data> zeroList = iMaxMinService.start(viaMatrixDistance);
-        List<HashMap<String, Object>> cluster = iKmeanService.start(zeroList, viaNearestNeighbor, clusterCount, iterCount);
+        List<Data> zeroList = iMaxMinService.start(viaMatrixDistance, "2d_data.txt");
+        List<HashMap<String, Object>> cluster = iKmeanService.start(zeroList, viaNearestNeighbor, clusterCount, iterCount, "2d_data.txt");
         HashMap map = new HashMap<>();
         map.put("ALG", cluster);
         map.put("FQ" , iReduceService.getQualityFunctional(cluster));
@@ -90,7 +89,7 @@ public class AlgorithmController {
         logger.debug("inside AlgorithmController.getReduce() method");
         logger.debug("====================================================================");
 //        List<Data> zeroList = iMaxMinService.start(viaMatrixDistance);
-        List<HashMap<String, Object>> cluster = iReduceService.start(false, null, initialValue, reduceValue);
+        List<HashMap<String, Object>> cluster = iReduceService.start(false, null, initialValue, reduceValue, "2d_data.txt");
         HashMap map = new HashMap<>();
         map.put("ALG", cluster);
         map.put("FQ" , iReduceService.getQualityFunctional(cluster));

@@ -20,7 +20,7 @@ import static kz.teamvictus.store.core.util.constance.CoreConstance.clusterObjec
 public class ReduceService implements IReduceService {
     private static final Logger logger = LoggerFactory.getLogger(ReduceService.class);
     // object list
-    private List<Data> dataList = FillFunctions.fillDataListFromTxtFile();
+    private List<Data> dataList;
     private List<HashMap<String, Object>> clusters;
     private Map<Integer, Double> qualityFunctional = new HashMap<Integer, Double>();
     private Double initialQF = 0.0;
@@ -29,12 +29,14 @@ public class ReduceService implements IReduceService {
     private IKmeanService kmeanService;
 
     @Override
-    public List<HashMap<String, Object>> start(Boolean customInput, List<Data> zeroList, Integer initialValue, Integer reduceValue){
+    public List<HashMap<String, Object>> start(Boolean customInput, List<Data> zeroList, Integer initialValue, Integer reduceValue,
+                                               String sourceFileName){
+        dataList = FillFunctions.fillDataListFromTxtFile(sourceFileName);
 
         // fill params by default value
         if(customInput){
             Scanner input = new Scanner(System.in);
-            clusters = kmeanService.start(null, false, 3, 50);
+            clusters = kmeanService.start(null, false, 3, 50, sourceFileName);
             System.out.println("Required cluster size: ");
             reduceValue = input.nextInt();
             while(reduceValue >= clusters.size()){
@@ -43,9 +45,9 @@ public class ReduceService implements IReduceService {
             }
         }else{
             if(zeroList != null){
-                clusters = kmeanService.start(zeroList, false, 3, 50);
+                clusters = kmeanService.start(zeroList, false, 3, 50, sourceFileName);
             }else{
-                clusters = kmeanService.startWithRandomCenter(initialValue, 3, 50);
+                clusters = kmeanService.startWithRandomCenter(initialValue, 3, 50, sourceFileName);
             }
         }
 

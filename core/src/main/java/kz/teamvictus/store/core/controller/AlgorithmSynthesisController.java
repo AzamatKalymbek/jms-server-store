@@ -3,15 +3,13 @@ package kz.teamvictus.store.core.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
-import kz.teamvictus.store.core.service.IAvoService;
-import kz.teamvictus.store.core.service.IKmeanService;
-import kz.teamvictus.store.core.service.IMaxMinService;
-import kz.teamvictus.store.core.service.IReduceService;
+import kz.teamvictus.store.core.service.*;
 import kz.teamvictus.store.core.util.models.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,18 +23,19 @@ import java.util.List;
 public class AlgorithmSynthesisController {
     private static final Logger logger = LoggerFactory.getLogger(AlgorithmSynthesisController.class);
 
-//    @Autowired
-//    private IAvoService iAvoService;
+    @Autowired
+    private ISynthesisService iSynthesisService;
 
 
 
-//    @GetMapping("/avo")
-//    @Produces("application/json")
-//    @ApiOperation(value = "AVO", tags = {"Algorithm"})
-//    public List<HashMap<String, Object>> getAVO() {
-//        logger.debug("inside AlgorithmController.getAVO() method");
-//        logger.debug("====================================================================");
-//        return iAvoService.start(null, 0);
-//    }
+    @GetMapping("/{sourceFileName}/{delta}")
+    @Produces("application/json")
+    @ApiOperation(value = "Alg Synthesis", tags = {"AlgorithmSynthesis"})
+    public HashMap getAlgSynthesis(@PathVariable("sourceFileName")  String sourceFileName,
+                                   @PathVariable("delta")           Integer delta) {
+        logger.debug("inside AlgorithmController.getAlgSynthesis() method");
+        logger.debug("====================================================================");
+        return iSynthesisService.start(sourceFileName, delta);
+    }
 
 }

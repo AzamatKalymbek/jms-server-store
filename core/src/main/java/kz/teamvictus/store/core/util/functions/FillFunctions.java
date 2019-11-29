@@ -14,11 +14,11 @@ import java.util.stream.Collectors;
 
 public class FillFunctions {
 
-    public static List<Data> fillDataListFromTxtFile(){
+    public static List<Data> fillDataListFromTxtFile(String fileName){
         try {
             List<Data> dataList = new ArrayList<>();
             ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            InputStream is = classloader.getResourceAsStream("2d_data.txt");
+            InputStream is = classloader.getResourceAsStream(fileName);
             InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
 
             BufferedReader br = new BufferedReader(streamReader);

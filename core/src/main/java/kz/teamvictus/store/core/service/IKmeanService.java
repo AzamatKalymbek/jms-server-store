@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface IKmeanService {
 
-    List<HashMap<String, Object>> start(List<Data> zeroList, Boolean viaNearestNeighbor,  Integer clusterCount, Integer iterCount);
+    List<HashMap<String, Object>> start(List<Data> zeroList, Boolean viaNearestNeighbor,  Integer clusterCount, Integer iterCount, String sourceFileName);
 
-    List<HashMap<String, Object>> startWithRandomCenter(Integer classSize, Integer clusterCount, Integer iterCount);
+    List<HashMap<String, Object>> startWithRandomCenter(Integer classSize, Integer clusterCount, Integer iterCount, String sourceFileName);
 
     void clear();
 }

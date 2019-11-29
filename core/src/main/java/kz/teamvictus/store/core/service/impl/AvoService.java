@@ -34,12 +34,12 @@ public class AvoService implements IAvoService {
     private List<Double> epsilonList = new ArrayList<>();
 
     @Override
-    public List<HashMap<String, Object>> start(List<Data> zeroList, Integer clusterCount, Integer gammaParam) {
+    public List<HashMap<String, Object>> start(List<Data> zeroList, Integer clusterCount, Integer gammaParam, String sourceFileName) {
         zeroLists = zeroList;
         clusters = new ArrayList<>();
 
         // fill params
-        dataList = FillFunctions.fillDataListFromTxtFile();
+        dataList = FillFunctions.fillDataListFromTxtFile(sourceFileName);
 
         calcEpsilon();
 //        System.out.println("Введите кол-во итераций:"); ITR = input.nextInt();

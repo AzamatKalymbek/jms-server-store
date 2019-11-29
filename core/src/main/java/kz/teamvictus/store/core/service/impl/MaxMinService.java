@@ -18,9 +18,9 @@ public class MaxMinService implements IMaxMinService {
     private static final Logger logger = LoggerFactory.getLogger(MaxMinService.class);
 
     @Override
-    public List<Data> start(Boolean viaMatrixDistance) {
+    public List<Data> start(Boolean viaMatrixDistance, String sourceFileName) {
         // fill params
-        List<Data> dataList = FillFunctions.fillDataListFromTxtFile();
+        List<Data> dataList = FillFunctions.fillDataListFromTxtFile(sourceFileName);
 
         // Display parameter list
 //        DisplayFunctions.printData(dataList);
