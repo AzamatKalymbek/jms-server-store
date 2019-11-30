@@ -46,52 +46,55 @@ public class AlgorithmController {
         return map;
     }
 
-    @GetMapping("/kmean/{clusterCount}/{iterCount}/{viaNearestNeighbor}")
+    @GetMapping("/kmean/{clusterCount}/{iterCount}/{viaNearestNeighbor}/{sourceFileName}")
     @Produces("application/json")
     @ApiOperation(value = "K - Mean", tags = {"Algorithm"})
     public HashMap getKmean(@PathVariable("clusterCount")       Integer clusterCount,
                             @PathVariable("iterCount")          Integer iterCount,
-                            @PathVariable("viaNearestNeighbor") Boolean viaNearestNeighbor) {
+                            @PathVariable("viaNearestNeighbor") Boolean viaNearestNeighbor,
+                            @PathVariable("sourceFileName")     String  sourceFileName) {
         logger.debug("inside AlgorithmController.getKmean() method");
         logger.debug("====================================================================");
         HashMap map = new HashMap<>();
-        List<HashMap<String, Object>> cluster = iKmeanService.start(null, viaNearestNeighbor, clusterCount, iterCount, "2d_data.txt");
+        List<HashMap<String, Object>> cluster = iKmeanService.start(null, viaNearestNeighbor, clusterCount, iterCount, sourceFileName);
         map.put("ALG", cluster);
         map.put("FQ" , iReduceService.getQualityFunctional(cluster));
         return map;
     }
 
-    @GetMapping("/max-min/{clusterCount}/{iterCount}/{viaNearestNeighbor}/{viaMatrixDistance}")
+    @GetMapping("/max-min/{clusterCount}/{iterCount}/{viaNearestNeighbor}/{viaMatrixDistance}/{sourceFileName}")
     @Produces("application/json")
     @ApiOperation(value = "MAX - MIN", tags = {"Algorithm"})
     public HashMap getMaxMin(@PathVariable("clusterCount")       Integer clusterCount,
                              @PathVariable("iterCount")          Integer iterCount,
                              @PathVariable("viaNearestNeighbor") Boolean viaNearestNeighbor,
-                             @PathVariable("viaMatrixDistance")  Boolean viaMatrixDistance) {
+                             @PathVariable("viaMatrixDistance")  Boolean viaMatrixDistance,
+                             @PathVariable("sourceFileName")     String  sourceFileName) {
         logger.debug("inside AlgorithmController.getMaxMin() method");
         logger.debug("====================================================================");
 
 
-        List<Data> zeroList = iMaxMinService.start(viaMatrixDistance, "2d_data.txt");
-        List<HashMap<String, Object>> cluster = iKmeanService.start(zeroList, viaNearestNeighbor, clusterCount, iterCount, "2d_data.txt");
+        List<Data> zeroList = iMaxMinService.start(viaMatrixDistance, sourceFileName);
+        List<HashMap<String, Object>> cluster = iKmeanService.start(zeroList, viaNearestNeighbor, clusterCount, iterCount, sourceFileName);
         HashMap map = new HashMap<>();
         map.put("ALG", cluster);
         map.put("FQ" , iReduceService.getQualityFunctional(cluster));
         return map;
     }
 
-    @GetMapping("/reduce/{initialValue}/{reduceValue}")
+    @GetMapping("/reduce/{initialValue}/{reduceValue}/{sourceFileName}")
     @Produces("application/json")
     @ApiOperation(value = "REDUCE", tags = {"Algorithm"})
     public HashMap getReduce(
             @PathVariable("initialValue")      Integer initialValue,
-            @PathVariable("reduceValue")       Integer reduceValue
+            @PathVariable("reduceValue")       Integer reduceValue,
+            @PathVariable("sourceFileName")    String  sourceFileName
     ) {
 //        @PathVariable("viaMatrixDistance") Boolean viaMatrixDistance
         logger.debug("inside AlgorithmController.getReduce() method");
         logger.debug("====================================================================");
 //        List<Data> zeroList = iMaxMinService.start(viaMatrixDistance);
-        List<HashMap<String, Object>> cluster = iReduceService.start(false, null, initialValue, reduceValue, "2d_data.txt");
+        List<HashMap<String, Object>> cluster = iReduceService.start(false, null, initialValue, reduceValue, sourceFileName);
         HashMap map = new HashMap<>();
         map.put("ALG", cluster);
         map.put("FQ" , iReduceService.getQualityFunctional(cluster));
