@@ -62,9 +62,6 @@ public class KmeanService implements IKmeanService {
             // step 3 Формируем классы
             // формула для нахождение расстояние между объектами
             // sqrt(pow((x1 - x2), 2) + pow((y1 - y2), 2))
-            System.out.println(dataList);
-            DisplayFunctions.printData(dataList);
-
             for (Data data : dataList) {
                 Double[] distanceList = new Double[clusterCount];
 

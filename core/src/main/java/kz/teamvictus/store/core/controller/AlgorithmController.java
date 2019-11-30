@@ -30,15 +30,17 @@ public class AlgorithmController {
     @Autowired
     private IReduceService iReduceService;
 
-    @GetMapping("/avo/{clusterCount}/{gammaParam}")
+    @GetMapping("/avo/{clusterCount}/{iterCount}/{gammaParam}/{sourceFileName}")
     @Produces("application/json")
     @ApiOperation(value = "AVO", tags = {"Algorithm"})
     public HashMap getAVO(@PathVariable("clusterCount") Integer clusterCount,
-                          @PathVariable("gammaParam") Integer gammaParam) {
+                          @PathVariable("iterCount") Integer iterCount,
+                          @PathVariable("gammaParam") Integer gammaParam,
+                          @PathVariable("sourceFileName") String sourceFileName) {
         logger.debug("inside AlgorithmController.getAVO() method");
         logger.debug("====================================================================");
         HashMap map = new HashMap<>();
-        List<HashMap<String, Object>> cluster = iAvoService.start(null, clusterCount, gammaParam, "2d_data.txt");
+        List<HashMap<String, Object>> cluster = iAvoService.start(null, clusterCount, iterCount, gammaParam, sourceFileName);
         map.put("ALG", cluster);
         map.put("FQ" , iReduceService.getQualityFunctional(cluster));
         return map;

@@ -171,20 +171,20 @@ public class SynthesisService implements ISynthesisService {
     private List<HashMap<String, Object>> algorithm8() {
         System.out.println("A-8 => max-min + ABO");
         List<Data> zeroList = iMaxMinService.start(false, sourceFileName);
-        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0, 2, sourceFileName);
+        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0, 50,2, sourceFileName);
         return clusters;
     }
 
     private List<HashMap<String, Object>> algorithm9() {
         System.out.println("A-9 => max-min(matrix distance) + ABO");
         List<Data> zeroList = iMaxMinService.start(true, sourceFileName);
-        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0, 2, sourceFileName);
+        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0, 50,2, sourceFileName);
         return clusters;
     }
 
     private List<HashMap<String, Object>> algorithm10() {
         System.out.println("A-10 => руч центр + ABO");
-        List<HashMap<String, Object>> clusters = iAvoService.start(null, 3, 2, sourceFileName);
+        List<HashMap<String, Object>> clusters = iAvoService.start(null, 3, 50, 2, sourceFileName);
         return clusters;
     }
 
@@ -257,20 +257,20 @@ public class SynthesisService implements ISynthesisService {
     private double algorithm8(List<Data> zeroList) {
         System.out.println("A-8 => max-min + ABO");
 //        List<Data> zeroList = Maxmin.startMaxminAlgorithm(false);
-        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0, 2, sourceFileName);
+        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0, 50, 2, sourceFileName);
         return iReduceService.getQualityFunctional(clusters);
     }
 
     private double algorithm9(List<Data> zeroList) {
         System.out.println("A-9 => max-min(matrix distance) + ABO");
 //        List<Data> zeroList = Maxmin.startMaxminAlgorithm(true);
-        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0, 2, sourceFileName);
+        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 0, 50, 2, sourceFileName);
         return iReduceService.getQualityFunctional(clusters);
     }
 
     private double algorithm10(List<Data> zeroList) {
         System.out.println("A-10 => руч центр + ABO");
-        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 3, 2, sourceFileName);
+        List<HashMap<String, Object>> clusters = iAvoService.start(zeroList, 3, 50, 2, sourceFileName);
         return iReduceService.getQualityFunctional(clusters);
     }
 

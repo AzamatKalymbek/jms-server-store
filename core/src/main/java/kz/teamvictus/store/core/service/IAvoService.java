@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface IAvoService {
 
-    List<HashMap<String, Object>> start(List<Data> zeroList, Integer clusterCount, Integer gammaParam, String sourceFileName);
+    List<HashMap<String, Object>> start(List<Data> zeroList, Integer clusterCount, Integer iterCount,  Integer gammaParam, String sourceFileName);
 }

@@ -29,14 +29,15 @@ public class AvoService implements IAvoService {
     private List<Data> zeroLists;
     private Integer[] centerIndexes;
 
-    private List<HashMap<String, Object>> clusters = new ArrayList<>();
-
     private List<Double> epsilonList = new ArrayList<>();
 
     @Override
-    public List<HashMap<String, Object>> start(List<Data> zeroList, Integer clusterCount, Integer gammaParam, String sourceFileName) {
+    public List<HashMap<String, Object>> start(List<Data> zeroList,
+                                               Integer clusterCount, Integer iterCount,
+                                               Integer gammaParam,
+                                               String sourceFileName) {
         zeroLists = zeroList;
-        clusters = new ArrayList<>();
+        List<HashMap<String, Object>> clusters = new ArrayList<>();
 
         // fill params
         dataList = FillFunctions.fillDataListFromTxtFile(sourceFileName);
@@ -68,53 +69,84 @@ public class AvoService implements IAvoService {
         clusters = fillCluster(true, clusters, new ArrayList<>(), clusterCount);
 
 //        DisplayFunctions.printResult14D(clusters);
+        for (int itr = 0; itr < iterCount; itr++) {
+            for (Data data : dataList) {
+                Double[] distanceList = new Double[clusterCount];
 
-        for (Data data : dataList) {
-            Double[] distanceList = new Double[clusterCount];
-
-            System.out.println("===================start==========================");
-            for (HashMap<String, Object> classEntity : clusters) {
-                List<Data> classSigns = (List<Data>) classEntity.get(clusterObjectsKey);
-                Data center = (Data) classEntity.get(clusterCenterKey);
-                if(CommonFunctions.checkForEquality(center, data)){
-                    distanceList = null;
-                    break;
-                }else{
-                    double distanceToAll = 0.0;
-                    for (Data sign : classSigns) {
-                        int epsCount = 0;
-                        for (int i = 0; i < data.getAttributes().size(); i++) {
-                            if (Math.abs(sign.getAttributes().get(i) - data.getAttributes().get(i)) <= epsilonList.get(i)) {
-                                epsCount++;
+                System.out.println("===================start==========================");
+                for (HashMap<String, Object> classEntity : clusters) {
+                    List<Data> classSigns = (List<Data>) classEntity.get(clusterObjectsKey);
+                    Data center = (Data) classEntity.get(clusterCenterKey);
+                    if (CommonFunctions.checkForEquality(center, data)) {
+                        distanceList = null;
+                        break;
+                    } else {
+                        double distanceToAll = 0.0;
+                        for (Data sign : classSigns) {
+                            int epsCount = 0;
+                            for (int i = 0; i < data.getAttributes().size(); i++) {
+                                if (Math.abs(sign.getAttributes().get(i) - data.getAttributes().get(i)) <= epsilonList.get(i)) {
+                                    epsCount++;
+                                }
                             }
+                            distanceToAll += epsCount;
                         }
-                        distanceToAll += epsCount;
-                    }
 
-//                    System.out.println("distanceToAll: " + distanceToAll);
-//                    System.out.println("classSigns.size()" + classSigns.size());
-                    distanceList[clusters.indexOf(classEntity)] = distanceToAll / classSigns.size();
+                        distanceList[clusters.indexOf(classEntity)] = distanceToAll / classSigns.size();
+                    }
                 }
+
+                System.out.println("===================end==========================");
+                if (distanceList == null) continue;
+
+                int minDistance = CommonFunctions.getMaxValueIndex(distanceList);
+                List<Data> tempObject = (List<Data>) clusters.get(minDistance).get(clusterObjectsKey);
+
+                tempObject.add(data);
+                clusters.get(minDistance).put(clusterObjectsKey, tempObject);
             }
 
-            System.out.println("===================end==========================");
-            if (distanceList == null) continue;
 
-//                DisplayFunctions.printDistance(distanceList);
-            int minDistance = CommonFunctions.getMaxValueIndex(distanceList);
-            List<Data> tempObject =
-                    (List<Data>) clusters.get(minDistance).get(clusterObjectsKey);
+            // step 4
+            // Корректировка центров
+            List<Data> newZeros = new ArrayList<>();
+            System.out.println("BEEEEFORE");
+            DisplayFunctions.printResult14D(clusters);
 
-            // checkForAVO(tempObject, data);
-            tempObject.add(data);
-            clusters.get(minDistance).put(clusterObjectsKey, tempObject);
+            for (HashMap<String, Object> cluster : clusters) {
+                List<Data> clusterObjects = (List<Data>) cluster.get(clusterObjectsKey);
+                int totalCount = clusterObjects.size();
+                System.out.println("116//////////////////////////////////////");
+                System.out.println(clusterObjects);
+                System.out.println("117//////////////////////////////////////");
+                List<Double> attributes = FillFunctions.fillAttributes(clusterObjects.get(0).getAttributes().size());
+
+                for (Data data : clusterObjects) {
+                    for (int attrIndex = 0; attrIndex < data.getAttributes().size(); attrIndex++) {
+                        double temp = attributes.get(attrIndex) + data.getAttributes().get(attrIndex);
+                        attributes.set(attrIndex, temp);
+                    }
+                }
+
+                for (int attrIndex = 0; attrIndex < attributes.size(); attrIndex++) {
+                    attributes.set(attrIndex, attributes.get(attrIndex) / totalCount);
+                }
+
+                newZeros.add(new Data(attributes));
+            }
+
+            DisplayFunctions.printData(newZeros);
+            System.out.println("118//////////////////////////////////////");
+            if (checkingForEqualityOfCenters(newZeros, clusterCount, clusters) || itr == iterCount - 1) {
+                System.out.println("Finish ITR: " + itr);
+                break;
+            } else {
+                clusters = fillCluster(false, clusters, newZeros, clusterCount);
+            }
+
+            System.out.println("ITR " + itr + " finished ...");
         }
 
-//        DisplayFunctions.printResult14D(clusters);
-
-        // calculate quality functional
-//        double QF = ReduceCentroid.getQualityFunctional(clusters);
-//        System.out.println("QUALITY FUNCTIONAL: " + QF);
         return clusters;
     }
 
@@ -169,7 +201,7 @@ public class AvoService implements IAvoService {
         return dividend / Math.sqrt(divider);
     }
 
-    private boolean checkingForEqualityOfCenters(List<Data> newZeros, Integer clusterCount) {
+    private boolean checkingForEqualityOfCenters(List<Data> newZeros, Integer clusterCount, List<HashMap<String, Object>> clusters) {
         int checkingIter = 0;
         for (int zeroIndex = 0; zeroIndex < newZeros.size(); zeroIndex++) {
             if (CommonFunctions.checkForEquality(
@@ -182,9 +214,9 @@ public class AvoService implements IAvoService {
     }
 
     private List<HashMap<String, Object>> fillCluster(boolean isDefault,
-                                                             List<HashMap<String, Object>> clusters,
-                                                             List<Data> newValues,
-                                                             Integer clusterCount) {
+                                                      List<HashMap<String, Object>> clusters,
+                                                      List<Data> newValues,
+                                                      Integer clusterCount) {
         if (isDefault) {
             if (zeroLists == null) {
                 for (int l = 0; l < clusterCount; l++) {
@@ -208,29 +240,41 @@ public class AvoService implements IAvoService {
             }
         } else {
             for (Data newValue : newValues) {
+                Data nearest = CommonFunctions.nearestObject(clusters.get(newValues.indexOf(newValue)), newValue);
+
                 HashMap<String, Object> objectMap = new HashMap<String, Object>();
-                objectMap.put(clusterCenterKey, newValue);
-
-                boolean centerExistInObjects = false;
-                for (HashMap<String, Object> cluster : clusters) {
-                    for (Data data : (List<Data>) cluster.get(clusterObjectsKey)) {
-                        if (CommonFunctions.checkForEquality(data, newValue)) {
-                            centerExistInObjects = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (centerExistInObjects)
-                    objectMap.put(clusterObjectsKey, new ArrayList<Data>() {{
-                        add(newValue);
-                    }});
-                else
-                    objectMap.put(clusterObjectsKey, new ArrayList<Data>());
-
+                objectMap.put(clusterCenterKey, nearest);
+                objectMap.put(clusterObjectsKey, new ArrayList<Data>() {{
+                    add(nearest);
+                }});
                 clusters.set(newValues.indexOf(newValue), objectMap);
             }
         }
         return clusters;
     }
 }
+
+
+//  for (Data newValue : newValues) {
+//          HashMap<String, Object> objectMap = new HashMap<String, Object>();
+//        objectMap.put(clusterCenterKey, newValue);
+//
+//        boolean centerExistInObjects = false;
+//        for (HashMap<String, Object> cluster : clusters) {
+//        for (Data data : (List<Data>) cluster.get(clusterObjectsKey)) {
+//        if (CommonFunctions.checkForEquality(data, newValue)) {
+//        centerExistInObjects = true;
+//        break;
+//        }
+//        }
+//        }
+//
+//        if (centerExistInObjects)
+//        objectMap.put(clusterObjectsKey, new ArrayList<Data>() {{
+//        add(newValue);
+//        }});
+//        else
+//        objectMap.put(clusterObjectsKey, new ArrayList<Data>());
+//
+//        clusters.set(newValues.indexOf(newValue), objectMap);
+//        }
